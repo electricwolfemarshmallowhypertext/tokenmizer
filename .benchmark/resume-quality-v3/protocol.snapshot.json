@@ -1,0 +1,886 @@
+{
+  "cases": [
+    {
+      "allowed_changes": [
+        "auth_session.py"
+      ],
+      "case_id": "auth_storage",
+      "current_choice": "server-issued httpOnly cookies",
+      "earlier_choice": "JWTs in localStorage",
+      "hidden_tests": "6bd689ceb1d11ffdd8d77d4bbf8c08ff8a5a33a2d3ff89201e514aeabbbe56c7",
+      "pending_task": "the refresh and logout flow without adding browser token storage",
+      "protected_files": [
+        "pyproject.toml",
+        "tests/test_auth_session.py"
+      ],
+      "rationale_groups": [
+        [
+          "xss",
+          "cross-site scripting"
+        ],
+        [
+          "localstorage"
+        ]
+      ],
+      "reason": "a review showed that an XSS bug could read bearer tokens from localStorage",
+      "repo_files": {
+        "auth_session.py": "912492dc84638d9e43576a4e95beb7dcf41c5b323422036144fb8f2ed2f89bc8",
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "tests/test_auth_session.py": "ee3b44012780982b9f6019730e2f1016ee260b1d275641632ca1488d7c4eeea8"
+      },
+      "title": "Auth storage",
+      "transcript": [
+        {
+          "content": "We're building a small authentication service for the customer portal. Start with JWTs in localStorage and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around JWTs in localStorage. The main work is in auth_session.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: a review showed that an XSS bug could read bearer tokens from localStorage. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from JWTs in localStorage to server-issued httpOnly cookies because a review showed that an XSS bug could read bearer tokens from localStorage. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including login cookie issuance.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added login cookie issuance and kept the changes focused in auth_session.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: the session cookie was missing the Secure flag.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in auth_session.py; the test that reproduces the session cookie was missing the Secure flag is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: browser JavaScript must never receive or persist either token. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked auth_session.py against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with the refresh and logout flow without adding browser token storage. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in auth_session.py. The scaffolding is there, but the refresh and logout flow without adding browser token storage still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish the refresh and logout flow without adding browser token storage, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    },
+    {
+      "allowed_changes": [
+        "jobs.py"
+      ],
+      "case_id": "database_concurrency",
+      "current_choice": "PostgreSQL row locking",
+      "earlier_choice": "SQLite for the job queue",
+      "hidden_tests": "833f90716255850ad0cb13be2325586638c7a232c384613d57484e555be5515e",
+      "pending_task": "safe background-job claiming so two workers cannot claim the same row",
+      "protected_files": [
+        "pyproject.toml",
+        "tests/test_jobs.py"
+      ],
+      "rationale_groups": [
+        [
+          "locked",
+          "locking",
+          "lock failures"
+        ],
+        [
+          "sqlite"
+        ]
+      ],
+      "reason": "parallel workers repeatedly hit SQLite database-locked failures",
+      "repo_files": {
+        "jobs.py": "152ab3e07775a54b6cce6e1d077a42cab008722e1a4b6f4050cab1dcd652e73d",
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "tests/test_jobs.py": "446024e475445052378f69f9ae43e5d778cd787b517eb9e45dc566b5bd92bac2"
+      },
+      "title": "Database concurrency",
+      "transcript": [
+        {
+          "content": "We're building a background worker that drains queued export jobs. Start with SQLite for the job queue and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around SQLite for the job queue. The main work is in jobs.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: parallel workers repeatedly hit SQLite database-locked failures. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from SQLite for the job queue to PostgreSQL row locking because parallel workers repeatedly hit SQLite database-locked failures. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including parameterized job insertion and status updates.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added parameterized job insertion and status updates and kept the changes focused in jobs.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: a quote in the payload broke the insert statement.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in jobs.py; the test that reproduces a quote in the payload broke the insert statement is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: workers run concurrently in separate processes and claiming must stay non-blocking. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked jobs.py against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with safe background-job claiming so two workers cannot claim the same row. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in jobs.py. The scaffolding is there, but safe background-job claiming so two workers cannot claim the same row still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish safe background-job claiming so two workers cannot claim the same row, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    },
+    {
+      "allowed_changes": [
+        "orders_api.py"
+      ],
+      "case_id": "api_compatibility",
+      "current_choice": "preserving the status wire field",
+      "earlier_choice": "renaming the public status field to state",
+      "hidden_tests": "bcac219cee0837e5874f6c6b5b46208d033083bc1bb8a2dea7c2d5c3ead69ffb",
+      "pending_task": "a detail endpoint while keeping the existing response contract",
+      "protected_files": [
+        "pyproject.toml",
+        "tests/test_orders_api.py"
+      ],
+      "rationale_groups": [
+        [
+          "partner"
+        ],
+        [
+          "quarter",
+          "migration",
+          "migrate"
+        ]
+      ],
+      "reason": "the partner client cannot migrate until its next quarterly release",
+      "repo_files": {
+        "orders_api.py": "730d1e614932915db45a17ad13bb64608bc9f51b6543b056fbf764912560e0f7",
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "tests/test_orders_api.py": "ae245b92ebfb837cb5678155d1d7b885869bf988adce00fd7454a728665cc941"
+      },
+      "title": "API compatibility",
+      "transcript": [
+        {
+          "content": "We're building a versioned order API used by our dashboard and a partner integration. Start with renaming the public status field to state and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around renaming the public status field to state. The main work is in orders_api.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: the partner client cannot migrate until its next quarterly release. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from renaming the public status field to state to preserving the status wire field because the partner client cannot migrate until its next quarterly release. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including the order-list serializer.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added the order-list serializer and kept the changes focused in orders_api.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: unknown internal states leaked a null onto the wire.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in orders_api.py; the test that reproduces unknown internal states leaked a null onto the wire is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: the partner treats any missing status key as a fatal protocol error. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked orders_api.py against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with a detail endpoint while keeping the existing response contract. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in orders_api.py. The scaffolding is there, but a detail endpoint while keeping the existing response contract still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish a detail endpoint while keeping the existing response contract, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    },
+    {
+      "allowed_changes": [
+        "event_stream.py"
+      ],
+      "case_id": "realtime_transport",
+      "current_choice": "server-sent events",
+      "earlier_choice": "WebSockets",
+      "hidden_tests": "28c7661706f0743b8c35e6231ec5513430ddac8c35a1b2a39cb1871a23cadde8",
+      "pending_task": "reconnect and event-resume behavior using Last-Event-ID",
+      "protected_files": [
+        "pyproject.toml",
+        "tests/test_event_stream.py"
+      ],
+      "rationale_groups": [
+        [
+          "serverless"
+        ],
+        [
+          "websocket",
+          "upgrade"
+        ]
+      ],
+      "reason": "the serverless runtime terminates WebSocket upgrades",
+      "repo_files": {
+        "event_stream.py": "9f57ab753a4c37fd00d9ad44a1ad62e66fb682e5f0c068d8982284e06dc86a8a",
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "tests/test_event_stream.py": "3a7df19149e42aceadd11979e9fab71c62c008e2854d183ecdde0915d2325d0a"
+      },
+      "title": "Realtime transport",
+      "transcript": [
+        {
+          "content": "We're building live deployment progress updates for the control panel. Start with WebSockets and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around WebSockets. The main work is in event_stream.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: the serverless runtime terminates WebSocket upgrades. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from WebSockets to server-sent events because the serverless runtime terminates WebSocket upgrades. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including SSE event formatting and heartbeat comments.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added SSE event formatting and heartbeat comments and kept the changes focused in event_stream.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: multiline payloads produced malformed event frames.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in event_stream.py; the test that reproduces multiline payloads produced malformed event frames is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: the deployment platform only permits ordinary streaming HTTP responses. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked event_stream.py against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with reconnect and event-resume behavior using Last-Event-ID. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in event_stream.py. The scaffolding is there, but reconnect and event-resume behavior using Last-Event-ID still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish reconnect and event-resume behavior using Last-Event-ID, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    },
+    {
+      "allowed_changes": [
+        "feature_flags.py"
+      ],
+      "case_id": "schema_freeze",
+      "current_choice": "an adapter backed by deployment configuration",
+      "earlier_choice": "adding an enabled column to the accounts table",
+      "hidden_tests": "c7e2fcfc60d4e31fca735b4800a2aaa831d95b302857bff81b778a5f603e9184",
+      "pending_task": "the beta feature flag without changing the database schema",
+      "protected_files": [
+        "schema.sql",
+        "pyproject.toml",
+        "tests/test_feature_flags.py"
+      ],
+      "rationale_groups": [
+        [
+          "migration"
+        ],
+        [
+          "frozen",
+          "freeze",
+          "launch"
+        ]
+      ],
+      "reason": "launch-week database migrations are frozen",
+      "repo_files": {
+        "feature_flags.py": "c29ec04f95ec83f7a501447903f7b35cb9430d41d6c6f92607768fabdb415b4e",
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "schema.sql": "5493699b0cc9b5d49947e51610408a48008b7e346df8ee11265855892e46a30f",
+        "tests/test_feature_flags.py": "7cd2200132738ab5ecee8f192f9a89a32857b53e7da4173d8e8a4857aa52c2f4"
+      },
+      "title": "Schema freeze",
+      "transcript": [
+        {
+          "content": "We're building a beta entitlement check for account-scoped features. Start with adding an enabled column to the accounts table and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around adding an enabled column to the accounts table. The main work is in feature_flags.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: launch-week database migrations are frozen. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from adding an enabled column to the accounts table to an adapter backed by deployment configuration because launch-week database migrations are frozen. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including configuration parsing and account normalization.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added configuration parsing and account normalization and kept the changes focused in feature_flags.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: mixed-case account IDs failed to match configuration.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in feature_flags.py; the test that reproduces mixed-case account IDs failed to match configuration is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: schema.sql is release-locked and cannot change before launch. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked feature_flags.py against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with the beta feature flag without changing the database schema. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in feature_flags.py. The scaffolding is there, but the beta feature flag without changing the database schema still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish the beta feature flag without changing the database schema, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    },
+    {
+      "allowed_changes": [
+        "indexing.py"
+      ],
+      "case_id": "private_data",
+      "current_choice": "the in-process local embedder",
+      "earlier_choice": "a hosted embedding API",
+      "hidden_tests": "61878c2864cefbe166973ce54db1d08a04e0a5313fbdca1983942f71e8cb5a3f",
+      "pending_task": "document indexing without an outbound embedding provider",
+      "protected_files": [
+        "pyproject.toml",
+        "tests/test_indexing.py"
+      ],
+      "rationale_groups": [
+        [
+          "cannot leave",
+          "private",
+          "regulated"
+        ],
+        [
+          "environment",
+          "egress",
+          "outbound"
+        ]
+      ],
+      "reason": "regulated documents cannot leave the environment",
+      "repo_files": {
+        "indexing.py": "b437bef973f4bed6cae4d4c1121bc04658812d92ead18e72b4931508047573af",
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "tests/test_indexing.py": "475518ded4152ed5ce5ead50d742fc467ba62540092047f495fddccb05524e52"
+      },
+      "title": "Private data",
+      "transcript": [
+        {
+          "content": "We're building semantic lookup over regulated support documents. Start with a hosted embedding API and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around a hosted embedding API. The main work is in indexing.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: regulated documents cannot leave the environment. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from a hosted embedding API to the in-process local embedder because regulated documents cannot leave the environment. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including deterministic local embeddings and text normalization.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added deterministic local embeddings and text normalization and kept the changes focused in indexing.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: empty documents caused a division-by-zero error.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in indexing.py; the test that reproduces empty documents caused a division-by-zero error is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: the indexing process runs with egress disabled and must stay deterministic. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked indexing.py against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with document indexing without an outbound embedding provider. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in indexing.py. The scaffolding is there, but document indexing without an outbound embedding provider still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish document indexing without an outbound embedding provider, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    },
+    {
+      "allowed_changes": [
+        "schema.json",
+        "generated_client.py"
+      ],
+      "case_id": "generated_code",
+      "current_choice": "changing schema.json and regenerating",
+      "earlier_choice": "editing generated_client.py by hand",
+      "hidden_tests": "05a68df898d55787b5b19fa17420b7687ea1c20eee0725edae2ff5212b5bb9ef",
+      "pending_task": "the priority field through the schema and regenerated client",
+      "protected_files": [
+        "generate_client.py",
+        "pyproject.toml",
+        "tests/test_generated_client.py"
+      ],
+      "rationale_groups": [
+        [
+          "generated",
+          "generation"
+        ],
+        [
+          "overwrite",
+          "disappear",
+          "regenerate"
+        ]
+      ],
+      "reason": "manual generated-client edits disappear on the next generation run",
+      "repo_files": {
+        "generate_client.py": "ba02a3205a2424487a795f614164780d072585edd4ba250d3f5b1aa5de2f383b",
+        "generated_client.py": "4db8bcfeb1a80000953450be14e5212a5129d94bffb4cbabd2e4026fe1dfb630",
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "schema.json": "6b96e1f18423aa5f67891de4d8a1fc235560b352617814ad47041ce79a7678f7",
+        "tests/test_generated_client.py": "66fee1101c75a6d6d74537d540cc758616f57e1685933c24af69a99905bf09fe"
+      },
+      "title": "Generated code",
+      "transcript": [
+        {
+          "content": "We're building a generated Python client for the task service schema. Start with editing generated_client.py by hand and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around editing generated_client.py by hand. The main work is in schema.json.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: manual generated-client edits disappear on the next generation run. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from editing generated_client.py by hand to changing schema.json and regenerating because manual generated-client edits disappear on the next generation run. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including the generator and stable field ordering.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added the generator and stable field ordering and kept the changes focused in generate_client.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: generation changed output order between runs.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in generate_client.py; the test that reproduces generation changed output order between runs is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: generated_client.py must be reproducible byte-for-byte from schema.json. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked schema.json against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with the priority field through the schema and regenerated client. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in schema.json. The scaffolding is there, but the priority field through the schema and regenerated client still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish the priority field through the schema and regenerated client, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    },
+    {
+      "allowed_changes": [
+        "payments.py"
+      ],
+      "case_id": "payment_retries",
+      "current_choice": "stable idempotency keys",
+      "earlier_choice": "blindly retrying charge creation",
+      "hidden_tests": "61ea758d2d4f1d571d6601b1fa57097bbef77c8ff7c244e9e6d5dcf054f5fb90",
+      "pending_task": "webhook retry handling that preserves the original idempotency key",
+      "protected_files": [
+        "pyproject.toml",
+        "tests/test_payments.py"
+      ],
+      "rationale_groups": [
+        [
+          "duplicate"
+        ],
+        [
+          "charge"
+        ],
+        [
+          "timeout",
+          "retry"
+        ]
+      ],
+      "reason": "a timeout followed by a retry produced duplicate charges",
+      "repo_files": {
+        "payments.py": "b17e9c72488323cbec8e024e279afa8fc1ea43cbe1a0a3bfba18c7a22989c8b7",
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "tests/test_payments.py": "272f11556f4d2d306a7935d5eeaf5a7ff9c87a8f2aa963189be8c68c6c503074"
+      },
+      "title": "Payment retries",
+      "transcript": [
+        {
+          "content": "We're building reliable payment processing around provider webhooks. Start with blindly retrying charge creation and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around blindly retrying charge creation. The main work is in payments.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: a timeout followed by a retry produced duplicate charges. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from blindly retrying charge creation to stable idempotency keys because a timeout followed by a retry produced duplicate charges. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including idempotent initial charge creation.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added idempotent initial charge creation and kept the changes focused in payments.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: replayed delivery IDs were processed twice.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in payments.py; the test that reproduces replayed delivery IDs were processed twice is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: one logical event must use the same key across every delivery attempt. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked payments.py against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with webhook retry handling that preserves the original idempotency key. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in payments.py. The scaffolding is there, but webhook retry handling that preserves the original idempotency key still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish webhook retry handling that preserves the original idempotency key, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    },
+    {
+      "allowed_changes": [
+        "schedules.py"
+      ],
+      "case_id": "time_handling",
+      "current_choice": "UTC-aware timestamps",
+      "earlier_choice": "storing local timestamps",
+      "hidden_tests": "1089a17f57216dbedb3b8a1164f6c4432a3d526da8b86a56471ff894d0fa88c8",
+      "pending_task": "recurring schedules while keeping every persisted instant in UTC",
+      "protected_files": [
+        "pyproject.toml",
+        "tests/test_schedules.py"
+      ],
+      "rationale_groups": [
+        [
+          "daylight",
+          "dst"
+        ],
+        [
+          "twice",
+          "duplicate"
+        ]
+      ],
+      "reason": "the daylight-saving transition scheduled the same job twice",
+      "repo_files": {
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "schedules.py": "28f5ece54126cf94949d9f6214a501a056b678a29fec27cfd80edd3b9306952b",
+        "tests/test_schedules.py": "17d9d4e9ecd71da55a1fbdc27fa4a1b72707b2e79a90d5fc4f44884b75bad016"
+      },
+      "title": "Time handling",
+      "transcript": [
+        {
+          "content": "We're building a scheduler for recurring customer reports. Start with storing local timestamps and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around storing local timestamps. The main work is in schedules.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: the daylight-saving transition scheduled the same job twice. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from storing local timestamps to UTC-aware timestamps because the daylight-saving transition scheduled the same job twice. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including UTC serialization and strict aware-datetime validation.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added UTC serialization and strict aware-datetime validation and kept the changes focused in schedules.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: naive datetimes were silently treated as server local time.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in schedules.py; the test that reproduces naive datetimes were silently treated as server local time is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: timezone names may be display metadata, but persisted run times are UTC instants. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked schedules.py against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with recurring schedules while keeping every persisted instant in UTC. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in schedules.py. The scaffolding is there, but recurring schedules while keeping every persisted instant in UTC still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish recurring schedules while keeping every persisted instant in UTC, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    },
+    {
+      "allowed_changes": [
+        "transport_client.py"
+      ],
+      "case_id": "runtime_constraint",
+      "current_choice": "the supported transport API v2",
+      "earlier_choice": "upgrading to transport API v3",
+      "hidden_tests": "3b07556d309b096a66279304bf8c282dbcbf9dd70639f069d7ff16dff9b94734",
+      "pending_task": "request tracing through the transport v2 hook API",
+      "protected_files": [
+        "requirements.txt",
+        "pyproject.toml",
+        "tests/test_transport_client.py"
+      ],
+      "rationale_groups": [
+        [
+          "python 3.10",
+          "runtime"
+        ],
+        [
+          "pinned"
+        ],
+        [
+          "v3",
+          "newer"
+        ]
+      ],
+      "reason": "production is pinned to Python 3.10 and the v3 package requires a newer runtime",
+      "repo_files": {
+        "pyproject.toml": "6d7cd4157ad488b231b3759cd94ef8af8fb2e3599e9e58f030d06e914f5e3b0c",
+        "requirements.txt": "a443abc711d0ae75933b71dd441e320b3a4c5e710cf384ecb5f7022e06908f41",
+        "tests/test_transport_client.py": "d2069db7dfff7fd27becffa8b3d90787bb9ccbab12d393c208b6c240fcd50d02",
+        "transport_client.py": "ffaaecf8e7ae5ee563f988ccdb7ae55069c2c975b7322fd47c6dc6820ba5fa7a"
+      },
+      "title": "Runtime constraint",
+      "transcript": [
+        {
+          "content": "We're building request tracing in a service with a pinned production image. Start with upgrading to transport API v3 and keep the first pass small.",
+          "role": "user"
+        },
+        {
+          "content": "I put the initial path together around upgrading to transport API v3. The main work is in transport_client.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "The first pass exposed a problem: production is pinned to Python 3.10 and the v3 package requires a newer runtime. We cannot ship while that remains true.",
+          "role": "user"
+        },
+        {
+          "content": "I switched from upgrading to transport API v3 to the supported transport API v2 because production is pinned to Python 3.10 and the v3 package requires a newer runtime. The old path should not come back.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please get the first usable slice in place, including the v2 transport wrapper and timeout forwarding.",
+          "role": "user"
+        },
+        {
+          "content": "That slice is working now. I added the v2 transport wrapper and timeout forwarding and kept the changes focused in transport_client.py.",
+          "role": "assistant"
+        },
+        {
+          "content": "I found one regression while checking it: zero-second timeouts were replaced by the default.",
+          "role": "user"
+        },
+        {
+          "content": "The regression is fixed in transport_client.py; the test that reproduces zero-second timeouts were replaced by the default is green now.",
+          "role": "assistant"
+        },
+        {
+          "content": "One production detail is easy to miss from the code: requirements.txt is image-locked and transport v2 only exposes event_hooks. Treat that as a hard limit.",
+          "role": "user"
+        },
+        {
+          "content": "Understood. I checked transport_client.py against that limit and left the protected pieces alone.",
+          "role": "assistant"
+        },
+        {
+          "content": "Next, continue with request tracing through the transport v2 hook API. Keep the current architecture and the regression fix intact.",
+          "role": "user"
+        },
+        {
+          "content": "I traced the remaining path in transport_client.py. The scaffolding is there, but request tracing through the transport v2 hook API still needs implementation and verification.",
+          "role": "assistant"
+        },
+        {
+          "content": "Please finish request tracing through the transport v2 hook API, run the tests, and give me the handoff when it is solid.",
+          "role": "user"
+        }
+      ]
+    }
+  ],
+  "claude_code_version": "2.1.220 (Claude Code)",
+  "methods": [
+    "raw_tail",
+    "strong_summary",
+    "tokenmizer"
+  ],
+  "order_seed": 260606337,
+  "protocol_version": "3.0.0",
+  "strict_checks": [
+    "functional_tests_pass",
+    "unfinished_task_completed",
+    "current_decision_followed",
+    "superseded_decision_absent",
+    "prior_fix_intact",
+    "correct_files_only",
+    "correct_rationale_present_and_obeyed"
+  ],
+  "tokenmizer_commit_sha": "f354cab2c9a4f3fc7946666d2ef6456e83457da2"
+}

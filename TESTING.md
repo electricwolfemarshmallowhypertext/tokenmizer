@@ -72,6 +72,13 @@ python3 scripts/static_audit.py                     # unused-import / silent-
                                                      # failure-pattern scanner
 python3 benchmarks/checkpoint_accuracy/runner_v3.py          # merge-logic fixtures
 python3 benchmarks/checkpoint_accuracy/runner_v3.py --live   # real LLM, real cost
+
+# End-to-end hard-reset continuation benchmark. Freeze is local; the next
+# two commands make 10 summary calls and 30 agentic continuation calls.
+python -m benchmarks.resume_quality.runner freeze --output .benchmark/resume-quality
+python -m benchmarks.resume_quality.runner summarize --suite .benchmark/resume-quality
+python -m benchmarks.resume_quality.runner run --suite .benchmark/resume-quality --output .benchmark/results
+python -m benchmarks.resume_quality.runner report --results .benchmark/results
 ```
 
 If `pytest` finds a real failure in the "written but not executed" category

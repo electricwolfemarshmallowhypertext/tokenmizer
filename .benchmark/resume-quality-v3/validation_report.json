@@ -1,0 +1,145 @@
+{
+  "checks": {
+    "all_caches_disabled": "pass",
+    "environment_overrides_yaml": {
+      "checks": {
+        "empty_environment_override_respected": true,
+        "environment_overrides_yaml": true,
+        "required_empty_rejected": true
+      },
+      "status": "pass"
+    },
+    "exact_model_provider_and_base_url_pinned": "pass",
+    "pre_and_post_call_hash_enforcement": "pass",
+    "protocol_binds_result_affecting_files": "pass",
+    "provider_usage_only_no_cost_estimate": "pass",
+    "single_fixed_token_counter": {
+      "checks": {
+        "api_compatibility:context_injected": true,
+        "api_compatibility:raw_tail_within_budget": true,
+        "api_compatibility:tokenmizer_exact_budget": true,
+        "auth_storage:context_injected": true,
+        "auth_storage:raw_tail_within_budget": true,
+        "auth_storage:tokenmizer_exact_budget": true,
+        "database_concurrency:context_injected": true,
+        "database_concurrency:raw_tail_within_budget": true,
+        "database_concurrency:tokenmizer_exact_budget": true,
+        "generated_code:context_injected": true,
+        "generated_code:raw_tail_within_budget": true,
+        "generated_code:tokenmizer_exact_budget": true,
+        "payment_retries:context_injected": true,
+        "payment_retries:raw_tail_within_budget": true,
+        "payment_retries:tokenmizer_exact_budget": true,
+        "private_data:context_injected": true,
+        "private_data:raw_tail_within_budget": true,
+        "private_data:tokenmizer_exact_budget": true,
+        "realtime_transport:context_injected": true,
+        "realtime_transport:raw_tail_within_budget": true,
+        "realtime_transport:tokenmizer_exact_budget": true,
+        "runtime_constraint:context_injected": true,
+        "runtime_constraint:raw_tail_within_budget": true,
+        "runtime_constraint:tokenmizer_exact_budget": true,
+        "schema_freeze:context_injected": true,
+        "schema_freeze:raw_tail_within_budget": true,
+        "schema_freeze:tokenmizer_exact_budget": true,
+        "time_handling:context_injected": true,
+        "time_handling:raw_tail_within_budget": true,
+        "time_handling:tokenmizer_exact_budget": true
+      },
+      "status": "pass",
+      "token_counter": "cl100k_base"
+    },
+    "single_worker_sequential_fresh_state": "pass",
+    "summary_over_budget_is_retried_not_trimmed": "pass",
+    "tokenmizer_context_injected": "pass",
+    "transport_structure_preserved": {
+      "captured_request": {
+        "max_tokens": 8,
+        "messages": [
+          {
+            "content": "user-preservation-sentinel",
+            "role": "user"
+          },
+          {
+            "content": [
+              {
+                "id": "toolu_transport_sentinel",
+                "input": {
+                  "path": "src/app.py"
+                },
+                "name": "inspect_repository",
+                "type": "tool_use"
+              }
+            ],
+            "role": "assistant"
+          },
+          {
+            "content": [
+              {
+                "content": "tool-result-preservation-sentinel",
+                "tool_use_id": "toolu_transport_sentinel",
+                "type": "tool_result"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "model": "qwen/qwen3-coder",
+        "provider": {
+          "allow_fallbacks": false,
+          "only": [
+            "deepinfra/turbo"
+          ],
+          "order": [
+            "deepinfra/turbo"
+          ],
+          "require_parameters": true
+        },
+        "stream": false,
+        "system": "system-preservation-sentinel",
+        "tools": [
+          {
+            "description": "Inspect one repository path",
+            "input_schema": {
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "type": "object"
+            },
+            "name": "inspect_repository"
+          }
+        ]
+      },
+      "checks": {
+        "model_exact": true,
+        "no_cache_control": true,
+        "provider_endpoint_exact": true,
+        "provider_url_exact": true,
+        "provider_usage_returned": true,
+        "response_model_exact": true,
+        "response_provider_exact": true,
+        "routing_metadata_enabled": true,
+        "streaming_off": true,
+        "system_preserved": true,
+        "tool_call_preserved": true,
+        "tool_definition_preserved": true,
+        "tool_result_preserved": true,
+        "user_preserved": true
+      },
+      "status": "pass"
+    },
+    "unsupported_memory_requires_blind_human_review": "pass"
+  },
+  "continuations_executed": 0,
+  "generated_at": "2026-08-01T16:19:11.215316+00:00",
+  "paid_model_calls_executed": 0,
+  "protocol_hash_v3": "2a34a382997680e2d523599117f7beea104552096a60eb6f424b749b30c2a642",
+  "protocol_version": "3.0.0",
+  "status": "pass",
+  "summaries_executed": 0
+}

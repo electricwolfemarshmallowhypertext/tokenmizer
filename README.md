@@ -475,6 +475,7 @@ TOKENMIZER_API_KEY=strong-key docker-compose up
 
 ```bash
 python benchmarks/checkpoint_accuracy/runner_v2.py
+python -m benchmarks.resume_quality.runner --help
 pytest tests/ -v
 ```
 
@@ -489,7 +490,17 @@ measured 2026-07-02 on v0.2.4):**
 
 Avg resume size: **254 tokens** vs ~1,500+ tokens of raw history.
 (n=3 synthetic sessions — small sample; treat as directional, reproduce
-with the command above.)
+with the command above.) This measures extraction recall only. It does
+**not** show that the resume context improves an agent's continued coding.
+
+**Structured State vs. Token Soup** is the end-to-end continuation
+benchmark for that stronger question. It freezes ten interrupted Git
+repositories, gives fresh Claude Code sessions either an equal-size raw
+tail, strong LLM handoff, or TokenMizer resume block, and requires all
+seven functional/decision/regression/file/rationale checks to pass. The
+protocol is implemented in
+[`benchmarks/resume_quality/`](benchmarks/resume_quality/README.md). No
+live result is claimed here until the frozen 30-arm run has completed.
 
 Enable `use_llm_extraction: true` for hybrid extraction (LLM + heuristic merge).
 
@@ -537,7 +548,7 @@ Git stores *what changed*, not *why you decided to change it*. You can't ask Git
 RAG retrieves *relevant chunks* — it doesn't model *decision state*. If you switched from bcrypt to Argon2 mid-session, RAG might retrieve both and confuse the model about which is current. TokenMizer tracks decision supersession explicitly: old decision is marked `SUPERSEDED`, new decision is `ACTIVE`. Resume context only includes current state.
 
 **Why not a plain summary at the start of each session?**
-Summaries lose structure. You can't query "all superseded decisions" or "what triggered the auth change" from a blob of text. Our benchmark shows graph memory preserves +5% more information than a summary baseline — and unlike summaries, the graph is queryable, editable, and grows incrementally without re-summarizing everything each turn.
+Summaries lose structure. You can't query "all superseded decisions" or "what triggered the auth change" from a blob of text. The small v2 synthetic extraction benchmark above found higher information preservation for graph memory, but it did not test coding continuation. The end-to-end resume-quality benchmark is the test for that claim. Unlike summaries, the graph is queryable, editable, and grows incrementally without re-summarizing everything each turn.
 
 **Why not Mem0 or Zep?**
 Mem0 and Zep store *facts* ("user prefers Python"). TokenMizer stores *decisions with rationale* — the full causal chain: what was decided, what replaced it, why, what evidence triggered the change, and how confidence shifted. If you need "remember my name across sessions," use Mem0. If you need "remember that we switched from PostgreSQL to SQLite because of cost, and here's the evidence," use TokenMizer.

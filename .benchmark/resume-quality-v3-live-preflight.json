@@ -1,0 +1,149 @@
+{
+  "base_url": "https://openrouter.ai/api",
+  "checks": {
+    "fallbacks_disabled": true,
+    "provider_confirmed": true,
+    "requested_model_used": true,
+    "streaming_off": true,
+    "system_preserved": true,
+    "tool_call_preserved": true,
+    "tool_definition_preserved": true,
+    "usage_returned": true,
+    "user_messages_preserved": true
+  },
+  "continuations_executed": 0,
+  "generated_at": "2026-08-01T16:16:00.559903+00:00",
+  "live_preflight_model_calls": 1,
+  "model": "qwen/qwen3-coder",
+  "protocol_hash_v3": "2a34a382997680e2d523599117f7beea104552096a60eb6f424b749b30c2a642",
+  "provider": "openrouter",
+  "provider_endpoint": "deepinfra/turbo",
+  "record_type": "transport_preflight_not_benchmark_result",
+  "request": {
+    "max_tokens": 64,
+    "messages": [
+      {
+        "content": "Perform the required transport check now.",
+        "role": "user"
+      }
+    ],
+    "model": "qwen/qwen3-coder",
+    "provider": {
+      "allow_fallbacks": false,
+      "only": [
+        "deepinfra/turbo"
+      ],
+      "order": [
+        "deepinfra/turbo"
+      ],
+      "require_parameters": true
+    },
+    "stream": false,
+    "system": "Protocol v3 live preflight. Call preflight_echo exactly once with token openrouter-v3. Do not answer with text.",
+    "tool_choice": {
+      "name": "preflight_echo",
+      "type": "tool"
+    },
+    "tools": [
+      {
+        "description": "Return the exact protocol transport sentinel.",
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "token": {
+              "enum": [
+                "openrouter-v3"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "token"
+          ],
+          "type": "object"
+        },
+        "name": "preflight_echo"
+      }
+    ]
+  },
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "call_4e69ed62b1e23463",
+        "input": {
+          "token": "openrouter-v3"
+        },
+        "name": "preflight_echo",
+        "type": "tool_use"
+      }
+    ],
+    "context_management": null,
+    "id": "gen-1785600958-wmZM3sQvNQuYGMq3BSX7",
+    "model": "qwen/qwen3-coder",
+    "openrouter_metadata": {
+      "attempt": 1,
+      "endpoints": {
+        "available": [
+          {
+            "model": "qwen/qwen3-coder-480b-a35b-07-25",
+            "provider": "DeepInfra",
+            "selected": true
+          }
+        ],
+        "total": 6
+      },
+      "is_byok": false,
+      "pipeline": [
+        {
+          "data": {
+            "action": "no_match",
+            "engines": [],
+            "filter_mode": "regex",
+            "flagged": false,
+            "matched_entity_types": []
+          },
+          "name": "content-filter",
+          "summary": "No PII detected (regex)",
+          "type": "guardrail"
+        }
+      ],
+      "region": "DFW",
+      "requested": "qwen/qwen3-coder",
+      "strategy": "direct",
+      "summary": "available=1, selected=DeepInfra"
+    },
+    "provider": "DeepInfra",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": null,
+      "cache_creation_input_tokens": null,
+      "cache_read_input_tokens": 64,
+      "cost": 0.0001035,
+      "cost_details": {
+        "upstream_inference_completions_cost": 2.6e-05,
+        "upstream_inference_cost": 0.0001035,
+        "upstream_inference_prompt_cost": 7.75e-05
+      },
+      "inference_geo": null,
+      "input_tokens": 237,
+      "is_byok": false,
+      "output_tokens": 26,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": null,
+      "service_tier": null,
+      "speed": "standard"
+    }
+  },
+  "status": "pass",
+  "summaries_executed": 0
+}

@@ -1,10 +1,29 @@
 """TokenMizer configuration — Pydantic Settings with env var support."""
 from __future__ import annotations
 
-from typing import List, Literal
+from copy import deepcopy
+from typing import Any, List, Literal
 
 from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, EnvSettingsSource, SettingsConfigDict
+
+
+def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+    """Return ``base`` with nested values from ``override`` applied."""
+    merged = deepcopy(base)
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = _deep_merge(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
+def _reject_required_empty(settings_cls: type[BaseSettings], values: dict[str, Any]) -> None:
+    """Reject explicit empty strings only for fields with no default."""
+    for name, field in settings_cls.model_fields.items():
+        if name in values and values[name] == "" and field.is_required():
+            raise ValueError(f"Required setting {name!r} cannot be empty")
 
 
 class CompressionSettings(BaseSettings):
@@ -126,7 +145,22 @@ class Settings(BaseSettings):
         import yaml
         with open(path) as f:
             data = yaml.safe_load(f) or {}
-        return cls(**data)
+        if not isinstance(data, dict):
+            raise ValueError("TokenMizer YAML root must be a mapping")
+
+        # BaseSettings normally gives constructor values higher priority than
+        # environment variables. YAML is passed as constructor data here, so
+        # relying on the default source order makes YAML incorrectly win.
+        # Read only explicitly-set OS environment values, merge them over YAML,
+        # then validate the final result with environment loading disabled.
+        env_source = EnvSettingsSource(
+            cls,
+            env_prefix=str(cls.model_config.get("env_prefix", "")),
+            env_nested_delimiter=str(cls.model_config.get("env_nested_delimiter", "__")),
+        )
+        merged = _deep_merge(data, env_source())
+        _reject_required_empty(cls, merged)
+        return cls(_env_file=None, **merged)
 
 
 _settings: Settings | None = None

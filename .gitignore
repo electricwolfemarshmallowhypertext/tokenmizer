@@ -6,6 +6,8 @@ build/
 .venv/
 venv/
 .pytest_cache/
+.tmp/
+.benchmark/
 .coverage
 benchmark_v*_results.json
 # checkpoints/  # removed: conflicts with tokenmizer/checkpoints/ module

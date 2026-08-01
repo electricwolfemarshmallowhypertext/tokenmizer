@@ -1,0 +1,81 @@
+{
+  "captured_request": {
+    "max_tokens": 8,
+    "messages": [
+      {
+        "content": "user-preservation-sentinel",
+        "role": "user"
+      },
+      {
+        "content": [
+          {
+            "id": "toolu_transport_sentinel",
+            "input": {
+              "path": "src/app.py"
+            },
+            "name": "inspect_repository",
+            "type": "tool_use"
+          }
+        ],
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "content": "tool-result-preservation-sentinel",
+            "tool_use_id": "toolu_transport_sentinel",
+            "type": "tool_result"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model": "qwen/qwen3-coder",
+    "provider": {
+      "allow_fallbacks": false,
+      "only": [
+        "deepinfra/turbo"
+      ],
+      "order": [
+        "deepinfra/turbo"
+      ],
+      "require_parameters": true
+    },
+    "stream": false,
+    "system": "system-preservation-sentinel",
+    "tools": [
+      {
+        "description": "Inspect one repository path",
+        "input_schema": {
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "type": "object"
+        },
+        "name": "inspect_repository"
+      }
+    ]
+  },
+  "checks": {
+    "model_exact": true,
+    "no_cache_control": true,
+    "provider_endpoint_exact": true,
+    "provider_url_exact": true,
+    "provider_usage_returned": true,
+    "response_model_exact": true,
+    "response_provider_exact": true,
+    "routing_metadata_enabled": true,
+    "streaming_off": true,
+    "system_preserved": true,
+    "tool_call_preserved": true,
+    "tool_definition_preserved": true,
+    "tool_result_preserved": true,
+    "user_preserved": true
+  },
+  "status": "pass"
+}
